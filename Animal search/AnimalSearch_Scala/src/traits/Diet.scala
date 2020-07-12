@@ -1,14 +1,18 @@
 package traits
 
 sealed trait Diet{
-  var diet: String;
+  val diet: String;
+  var animals:List[String]
 }
 case object Herbivore extends Diet {
-  override var diet: String = "Herbivore"
+  override val diet: String = "Herbivore"
+  override var animals: List[String] = Nil
 }
 case object Carnivore extends Diet {
-  override var diet: String = "Carnivore"
+  override val diet: String = "Carnivore"
+  override var animals: List[String] = Nil
 }
 case object Omnivore extends Diet {
-  override var diet: String = "Omnivore"
+  override val diet: String = "Omnivore"
+  override var animals: List[String] = Nil
 }

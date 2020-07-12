@@ -17,11 +17,16 @@ object Main extends App {
     try {
       Integer.parseInt(selection) match {
         case 1 => {print("type in the animal name you would like to find information on: \n")
-          var result = Excel.searchName(readLine())
-          print(result.toString())
+          print(Excel.searchName(readLine()).toString())
         }
-        case 2 => "class"
-        case 3 => "diet"
+        case 2 => {
+          println("please enter the class of animal you are trying to find:")
+          Excel.allOfClass(readLine().toLowerCase())
+        }
+        case 3 => {
+          println("Please enter the diet type of the animal you are trying to find:")
+          Excel.allOfDiet(readLine().toLowerCase())
+        }
         case 4 => println("Exiting Program")
           System.exit(0);
         case _ => "Invalid Selection"

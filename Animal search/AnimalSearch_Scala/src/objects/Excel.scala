@@ -34,13 +34,15 @@ object Excel{
               currentSheet.getRow(r).getCell(c).getStringCellValue match{
                 case "aves"=>{
                   animalClass = Aves
-
+                  Aves.animals = Aves.animals:::(animalCommonName::Nil)
                 }
                 case "reptilia" => {
                   animalClass = Reptilia
+                  Reptilia.animals = Reptilia.animals:::(animalCommonName::Nil)
                 }
                 case "mammalia" => {
                   animalClass = Mammalia
+                  Mammalia.animals = Mammalia.animals:::(animalCommonName::Nil)
                 }
               }
 
@@ -49,12 +51,15 @@ object Excel{
               currentSheet.getRow(r).getCell(c).getStringCellValue match{
                 case "herbivore" => {
                   animalDiet = Herbivore
+                  Herbivore.animals = Herbivore.animals:::(animalCommonName::Nil)
                 }
                 case "omnivore" => {
                   animalDiet = Omnivore
+                  Omnivore.animals = Omnivore.animals:::(animalCommonName::Nil)
                 }
                 case "carnivore" => {
                   animalDiet = Carnivore
+                  Carnivore.animals = Carnivore.animals:::(animalCommonName::Nil)
                 }
                 case _ => {
                   println("not valid diet")
@@ -92,8 +97,43 @@ object Excel{
    hashMap.apply(search)
   }
 
-  def findAll(search:String) = {
-    hashMap.values.toString()
+  def allOfClass(search:String) = {
+    search match{
+      case "aves"=>{
+        for(x <- Aves.animals){
+          println(searchName(x).toString())
+        }
+    }
+      case "reptilia"=> {
+        for (x <- Reptilia.animals) {
+          println(searchName(x).toString())
+        }
+      }
+        case "mammalia"=>{
+          for(x <- Mammalia.animals){
+            println(searchName(x).toString())
+        }
+      }
+    }
+  }
+  def allOfDiet(search:String) = {
+    search match{
+      case "omnivore"=>{
+        for(x <- Omnivore.animals){
+          println(searchName(x).toString())
+        }
+      }
+      case "herbivore"=> {
+        for (x <- Herbivore.animals) {
+          println(searchName(x).toString())
+        }
+      }
+      case "carnivore"=>{
+        for(x <- Carnivore.animals){
+          println(searchName(x).toString())
+        }
+      }
+    }
   }
 
 
