@@ -1,2 +1,2 @@
 # PracticeProjects
-Projects to practice programming and learn languages
+Varies projects with a focus on learning new programming practices and languages
