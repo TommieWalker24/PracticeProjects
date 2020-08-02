@@ -55,4 +55,5 @@ public class CalendarDay {
     public LocalDate getPreviousDay(){
         return LocalDate.of(dayID.getValue2().intValue(), dayID.getValue0().intValue(), dayID.getValue1().intValue()).minusDays(1);
     }
+
 }

@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.tjlabs.planner.R;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
@@ -59,12 +60,15 @@ public class MainActivity extends AppCompatActivity {
                         String calendarId = calendarDay.toString();
 
                         if (sharedPreferences.contains(calendarId)) {
-                            reviewDate(calendarView);
+                            calendarDay.setNotes((HashSet<String>) sharedPreferences.getStringSet(calendarId, null));
+                            reviewDate(calendarDay);
                         } else {
                             Set<String> hash_Set = new HashSet<String>();
                             hash_Set.add("this");
                             hash_Set.add("is");
                             hash_Set.add("new");
+                            calendarDay.setNotes((HashSet<String>) hash_Set);
+
                             editor.putStringSet(calendarId, hash_Set);
                             editor.apply();
                         }
@@ -79,12 +83,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //function to start the EditDateActivity and to send it the selectedDate
-    public void reviewDate(View view){
+    public void reviewDate(CalendarDay calendarDay){
         Intent intent = new Intent(this, EditDateActivity.class);
         TextView dateTextView = findViewById(R.id.dateInsert);
         String selectDate = dateTextView.getText().toString();
         intent.putExtra("Date", selectDate);
-
+        ArrayList<String> tasks = new ArrayList<>(calendarDay.getNotes());
+        intent.putExtra("Tasks", tasks);
         startActivity(intent);
     }
 }
