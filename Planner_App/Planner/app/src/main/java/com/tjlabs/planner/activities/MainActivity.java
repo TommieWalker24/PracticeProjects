@@ -27,18 +27,12 @@ import java.util.Set;
 import objects.CalendarDay;
 
 public class MainActivity extends AppCompatActivity {
-    //define globals here
-//    SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("Notes",MODE_PRIVATE );
-//   // SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-//    SharedPreferences.Editor editor = sharedPreferences.edit();
-   // SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
-   // SharedPreferences.Editor editor = sharedPref.edit();
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        final SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("Notes",MODE_PRIVATE );
+        final SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("Notes",MODE_PRIVATE);
         final SharedPreferences.Editor editor = sharedPreferences.edit();
         //Set which layout to render
         setContentView(R.layout.calendar_view);
@@ -55,7 +49,8 @@ public class MainActivity extends AppCompatActivity {
             public void onSelectedDayChange(@NonNull CalendarView view, final int year, final int month, final int dayOfMonth) {
                 new Thread(new Runnable() {
                     public void run() {
-                        CalendarDay calendarDay = new CalendarDay(month, dayOfMonth, year);
+                        //month is in array 0-11, add 1 to get current month
+                        CalendarDay calendarDay = new CalendarDay(month+1, dayOfMonth, year);
                         date.setText(calendarDay.toString());
                         String calendarId = calendarDay.toString();
 

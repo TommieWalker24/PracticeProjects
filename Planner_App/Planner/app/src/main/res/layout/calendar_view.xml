@@ -21,6 +21,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
+        android:fontFamily="@font/alegreya_sans_medium"
+        android:hint="mm/dd/yyyy"
         android:inputType="date"
+        android:paddingLeft="140dp"
+        android:paddingRight="40dip"
+        android:singleLine="true"
+        android:textSize="30sp"
         tools:visibility="visible" />
 </LinearLayout>

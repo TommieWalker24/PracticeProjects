@@ -49,9 +49,11 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder>{
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            textViewTask = (TextView) itemView.findViewById(R.id.textViewTask);
+            textViewTask = (TextView) itemView.findViewById(R.id.multiAutoCompleteTextView);
         }
     }
 
-
+    public Context getContext() {
+        return context;
+    }
 }

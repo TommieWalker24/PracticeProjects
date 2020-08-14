@@ -29,6 +29,10 @@
         android:layout_marginRight="23dp"
         android:ems="10"
         android:inputType="date"
+        android:paddingLeft="50dip"
+        android:paddingRight="30dip"
+        android:singleLine="true"
+        android:textSize="14sp"
         app:layout_constraintEnd_toStartOf="@+id/nextDate"
         app:layout_constraintStart_toEndOf="@+id/previosDate"
         app:layout_constraintTop_toTopOf="parent" />
@@ -58,6 +62,7 @@
         android:layout_marginTop="25dp"
         android:layout_marginEnd="168dp"
         android:layout_marginRight="168dp"
+        android:enabled="true"
         android:text="Edit"
         android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
@@ -69,12 +74,29 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
-        android:layout_width="411dp"
-        android:layout_height="593dp"
-        android:layout_marginTop="25dp"
+        android:layout_width="409dp"
+        android:layout_height="536dp"
+        android:layout_marginTop="16dp"
+        android:background="#F3F0F0"
+        android:isScrollContainer="true"
+        android:scrollbars="vertical"
+        android:verticalScrollbarPosition="right"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/switch1" />
+        app:layout_constraintTop_toBottomOf="@+id/switch1"
+        tools:itemCount="500" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/addTaskFloatingActionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="356dp"
+        android:layout_marginLeft="356dp"
+        android:clickable="true"
+        android:focusable="auto"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@android:drawable/ic_input_add" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
