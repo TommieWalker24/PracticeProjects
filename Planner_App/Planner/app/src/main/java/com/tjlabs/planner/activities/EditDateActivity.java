@@ -20,6 +20,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.CompoundButton;
+import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -42,6 +43,7 @@ import objects.CalendarDay;
 
 public class EditDateActivity extends AppCompatActivity {
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,6 +64,8 @@ public class EditDateActivity extends AppCompatActivity {
         Button prevDateButton = findViewById(R.id.previosDate);
         final FloatingActionButton addLineFloatingActionButton = findViewById(R.id.addTaskFloatingActionButton);
         addLineFloatingActionButton.setVisibility(View.GONE);
+        final FloatingActionButton calendarFloatingActionButton = findViewById(R.id.calendarFloatingActionButton);
+        calendarFloatingActionButton.setVisibility(View.VISIBLE);
         //init switch
         final Switch editSwitch = findViewById(R.id.switch1);
 
@@ -83,16 +87,12 @@ public class EditDateActivity extends AppCompatActivity {
                 if(isChecked){
                     //make add line button visible
                     addLineFloatingActionButton.setVisibility(View.VISIBLE);
-                    for(int i = 0; i< Objects.requireNonNull(recyclerView.getLayoutManager()).getChildCount(); i++){
+                    calendarFloatingActionButton.setVisibility(View.GONE);
+                    //RecyclerView layout
+                    LinearLayoutManager layout = (LinearLayoutManager) recyclerView.getLayoutManager();
+                    for(int i  = layout.findFirstVisibleItemPosition(); i <= layout.findLastVisibleItemPosition(); i++){
                         View view = Objects.requireNonNull(recyclerView.getLayoutManager()).findViewByPosition(i);
-                        //if view is null it means the view is not displayed on the page
-                        if(view == null){
-                            recyclerView.scrollToPosition(i);
-                            view = recyclerView.getChildAt(i);
-                            if(view == null){
-                                break;
-                            }
-                        }
+                        //if view is ever null it means the view is not displayed on the page
                         final TextView textView = (TextView) view.findViewById(R.id.multiAutoCompleteTextView);
                         textView.setEnabled(true);
                         final int finalI = i;
@@ -105,57 +105,14 @@ public class EditDateActivity extends AppCompatActivity {
                         });
                         final String[] before = new String[1];
                         final String[] after = new String[1];
-                        textView.addTextChangedListener(new TextWatcher() {
-                            @Override
-                            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                                before[0] = s.toString();
-                            }
-
-                            @Override
-                            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                                after[0] = s.toString();
-                            }
-
-                            @Override
-                            public void afterTextChanged(Editable s) {
-                                CalendarDay calendarDay = new CalendarDay(selectedDate[0]);
-                                Set<String> hash_Set = sharedPreferences.getStringSet(calendarDay.toString(), null);
-                                assert hash_Set != null;
-                                hash_Set.remove(before[0]);
-                                hash_Set.add(after[0]);
-
-                                editor.remove(calendarDay.toString());
-                                editor.apply();
-
-                                editor.putStringSet(calendarDay.toString(), hash_Set);
-                                editor.apply();
-
-//                                int foundIndex = taskList[0].indexOf(before[0]);
-//                                taskList[0].set(foundIndex, after[0]);
-                               // taskAdapter[0][0].notifyDataSetChanged();
-
-                            }
-                        });
-                        //todo: resize the recyclerView when the a textView is selected
-//                        textView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-//                            @Override
-//                            public void onFocusChange(View v, boolean hasFocus) {
-//                                ViewGroup.LayoutParams layoutParams =  recyclerView.getLayoutParams();
-//                                if(v.requestFocus()){
-//                                    layoutParams.height = 350;
-//                                    recyclerView.setLayoutParams(layoutParams);
-//                                }
-//                                if(hasFocus == false){
-//                                    layoutParams.height = 536;
-//                                    recyclerView.setLayoutParams(layoutParams);
-//                                }
-//                            }
-//                        });
+                        textChangeListener(textView,selectedDate[0], sharedPreferences, editor, taskAdapter[0][0]);
                     }
                 }
                 //if switch is off, detach task textView listeners
                 else{
+                    //remove add line button
                     addLineFloatingActionButton.setVisibility(View.GONE);
+                    calendarFloatingActionButton.setVisibility(View.VISIBLE);
                     for(int i = 0; i< taskList[0].size(); i++){
                         View view = Objects.requireNonNull(recyclerView.getLayoutManager()).findViewByPosition(i);
                         if(view == null){
@@ -175,6 +132,25 @@ public class EditDateActivity extends AppCompatActivity {
             }
         });
 
+
+        recyclerView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+            @Override
+            public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                LinearLayoutManager layout = (LinearLayoutManager) recyclerView.getLayoutManager();
+                    for(int i  = layout.findFirstVisibleItemPosition(); i <= layout.findLastVisibleItemPosition(); i++) {
+                        View view = layout.findViewByPosition(i);
+                        TextView textView = view.findViewById(R.id.multiAutoCompleteTextView);
+                        if (editSwitch.isChecked()) {
+                            textView.setEnabled(true);
+                            textChangeListener(textView,selectedDate[0], sharedPreferences, editor, taskAdapter[0][0]);
+                        }
+                        else{
+                            textView.setEnabled(false);
+                        }
+                    }
+                }
+        });
+
         //Next Button
         nextDateButton.setOnClickListener(new View.OnClickListener(){
             @RequiresApi(api = Build.VERSION_CODES.O)
@@ -191,7 +167,7 @@ public class EditDateActivity extends AppCompatActivity {
                 //check for existence of nextDay, if there display, if not create it in editor and put a blank in the first spot
                 if(!sharedPreferences.contains(nextDay.toString())){
                     HashSet<String> hash_Set = new HashSet<String>();
-                    hash_Set.add(" ");
+                    hash_Set.add("");
                     calendarDay.setNotes(hash_Set);
                     editor.putStringSet(nextDay.toString(), hash_Set);
                     editor.apply();
@@ -219,7 +195,7 @@ public class EditDateActivity extends AppCompatActivity {
                 //check for existence of prevDay, if there display, if not create it in editor and put a blank in the first spot
                 if(!sharedPreferences.contains(prevDay.toString())){
                     HashSet<String> hash_Set = new HashSet<String>();
-                    hash_Set.add(" ");
+                    hash_Set.add("");
                     calendarDay.setNotes(hash_Set);
                     editor.putStringSet(prevDay.toString(), hash_Set);
                     editor.apply();
@@ -242,7 +218,7 @@ public class EditDateActivity extends AppCompatActivity {
                     //turn edit mode off
                     editSwitch.performClick();
                     Set<String> hash_Set = sharedPreferences.getStringSet(selectedDate[0], null);
-                    hash_Set.add(" ");
+                    hash_Set.add("");
                     editor.putStringSet(selectedDate[0], hash_Set);
                     editor.apply();
                     ArrayList<String> compareList =  new ArrayList<>(Objects.requireNonNull(sharedPreferences.getStringSet(selectedDate[0], null)));
@@ -253,10 +229,59 @@ public class EditDateActivity extends AppCompatActivity {
                             taskAdapter[0][0].notifyDataSetChanged();
                         }
                     }
-
                     //turn edit mode back on to re-attach listeners for all items in list
                     editSwitch.performClick();
                 }
+            }
+        });
+
+        //Calendar View button
+        calendarFloatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!editSwitch.isChecked()){
+                    returnToCalendarView();
+                }
+            }
+        });
+    }
+    public void returnToCalendarView(){
+        Intent intent = new Intent(this, MainActivity.class);
+
+        startActivity(intent);
+    }
+
+    void textChangeListener(TextView textView, final String selectedDate, final SharedPreferences sharedPreferences, final SharedPreferences.Editor editor, final TaskAdapter taskAdapter){
+        textView.addTextChangedListener(new TextWatcher() {
+            String before;
+            String after;
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                before = s.toString();
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                after = s.toString();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                CalendarDay calendarDay = new CalendarDay(selectedDate);
+                Set<String> hash_Set = sharedPreferences.getStringSet(calendarDay.toString(), null);
+                assert hash_Set != null;
+                hash_Set.remove(before);
+                hash_Set.add(after);
+                editor.remove(calendarDay.toString());
+                editor.apply();
+
+                editor.putStringSet(calendarDay.toString(), hash_Set);
+                editor.apply();
+
+//                                int foundIndex = taskList[0].indexOf(before[0]);
+//                                taskList[0].set(foundIndex, after[0]);
+                // taskAdapter[0][0].notifyDataSetChanged();
+
             }
         });
     }

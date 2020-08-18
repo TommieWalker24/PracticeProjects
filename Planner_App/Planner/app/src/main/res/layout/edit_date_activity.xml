@@ -59,7 +59,7 @@
         android:layout_height="36dp"
         android:layout_marginStart="169dp"
         android:layout_marginLeft="169dp"
-        android:layout_marginTop="25dp"
+        android:layout_marginTop="15dp"
         android:layout_marginEnd="168dp"
         android:layout_marginRight="168dp"
         android:enabled="true"
@@ -74,9 +74,9 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
-        android:layout_width="409dp"
-        android:layout_height="536dp"
-        android:layout_marginTop="16dp"
+        android:layout_width="0dp"
+        android:layout_height="210dp"
+        android:layout_marginTop="8dp"
         android:background="#F3F0F0"
         android:isScrollContainer="true"
         android:scrollbars="vertical"
@@ -91,12 +91,25 @@
         android:id="@+id/addTaskFloatingActionButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="356dp"
-        android:layout_marginLeft="356dp"
+        android:layout_marginStart="345dp"
+        android:layout_marginLeft="345dp"
         android:clickable="true"
         android:focusable="auto"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/calendarFloatingActionButton"
         app:srcCompat="@android:drawable/ic_input_add" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/calendarFloatingActionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginLeft="4dp"
+        android:clickable="true"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@android:drawable/ic_menu_my_calendar"
+        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

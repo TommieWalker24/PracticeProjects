@@ -59,13 +59,11 @@ public class MainActivity extends AppCompatActivity {
                             reviewDate(calendarDay);
                         } else {
                             Set<String> hash_Set = new HashSet<String>();
-                            hash_Set.add("this");
-                            hash_Set.add("is");
-                            hash_Set.add("new");
+                            hash_Set.add("");
                             calendarDay.setNotes((HashSet<String>) hash_Set);
-
                             editor.putStringSet(calendarId, hash_Set);
                             editor.apply();
+                            reviewDate(calendarDay);
                         }
                     }
 
