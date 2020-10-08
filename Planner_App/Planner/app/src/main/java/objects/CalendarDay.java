@@ -7,14 +7,18 @@ import androidx.annotation.RequiresApi;
 import org.javatuples.Triplet;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
 
 public class CalendarDay {
     //  month/day/year format
     Triplet<Integer, Integer, Integer> dayID;
-    HashSet<String> notes;
+    private LinkedHashSet<String> notes;
+//    ArrayList<Note> noteList;
 
 
 
@@ -42,7 +46,20 @@ public class CalendarDay {
         return notes;
     }
 
-    public void setNotes(HashSet<String> notes) {
+//    public void setNoteList(){
+//        ArrayList<String> tempNotes = new ArrayList<String>(notes);
+//        int index = 0;
+//        for(String note: tempNotes){
+//            if(index == 0){
+//                noteList.set(tempNotes.size() - 1,new Note(note, tempNotes.size() - 1));
+//            }
+//            else if(index == )
+//            noteList.add(new Note(note, index));
+//
+//        }
+//    }
+
+    public void setNotes(LinkedHashSet<String> notes) {
         this.notes = notes;
     }
 

@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import objects.CalendarDay;
@@ -55,16 +56,31 @@ public class MainActivity extends AppCompatActivity {
                         String calendarId = calendarDay.toString();
 
                         if (sharedPreferences.contains(calendarId)) {
-                            calendarDay.setNotes((HashSet<String>) sharedPreferences.getStringSet(calendarId, null));
-                            reviewDate(calendarDay);
-                        } else {
-                            Set<String> hash_Set = new HashSet<String>();
-                            hash_Set.add("");
-                            calendarDay.setNotes((HashSet<String>) hash_Set);
-                            editor.putStringSet(calendarId, hash_Set);
-                            editor.apply();
-                            reviewDate(calendarDay);
+                            Boolean foundAll = false;
+                            int index = 0;
+                            LinkedHashSet<String> hashSet = new LinkedHashSet<>();
+                            while(!foundAll){
+                                if(sharedPreferences.contains(calendarId+"_"+(index))){
+                                    hashSet.add(sharedPreferences.getString(calendarId+"_"+index, null));
+                                    index++;
+                                }
+                                else{
+                                    foundAll =true;
+                                }
+                            }
+                            calendarDay.setNotes(hashSet);
                         }
+                        else {
+                            LinkedHashSet<String> hash_Set = new LinkedHashSet<>();
+                            hash_Set.add("");
+                            calendarDay.setNotes(hash_Set);
+                            //mark date as something that contains notes
+                            editor.putString(calendarId, "Used");
+                            // key of the calendar id and underscore int specifies the place of the not in a list
+                            editor.putString(calendarId+"_0","");
+                            editor.apply();
+                        }
+                        reviewDate(calendarDay);
                     }
 
                 }).start();
