@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#2239F4F4"
+    android:orientation="vertical">
+
+    <CalendarView
+        android:id="@+id/calendarView"
+        android:layout_width="match_parent"
+        android:layout_height="364dp"
+        android:selectedWeekBackgroundColor="#FFFFFF"
+        android:visibility="visible"
+        android:weekDayTextAppearance="@style/TextAppearance.AppCompat.Body1" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="serif-monospace"
+        android:text="Enter Date : mm/dd/yyyy " />
+
+    <EditText
+        android:id="@+id/dateInsert"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:fontFamily="cursive"
+        android:hint="mm/dd/yyyy"
+        android:inputType="date"
+        android:paddingLeft="140dp"
+        android:paddingRight="40dip"
+        android:singleLine="true"
+        android:textSize="30sp"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/quoteP1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/elsie"
+        android:paddingLeft="110dp"
+        android:paddingTop="20dp"
+        android:paddingRight="14dp"
+        android:text="Plans are nothing"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display2"
+        android:textColor="#F82626"
+        android:textSize="30sp" />
+
+    <TextView
+        android:id="@+id/quoteP2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/elsie"
+        android:paddingLeft="35dp"
+        android:paddingTop="10dp"
+        android:singleLine="true"
+        android:text="Planning is everything"
+        android:textColor="#F82626"
+        android:textSize="36sp" />
+</LinearLayout>
