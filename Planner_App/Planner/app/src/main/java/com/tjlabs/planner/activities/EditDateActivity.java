@@ -4,14 +4,10 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -85,8 +81,8 @@ public class EditDateActivity extends AppCompatActivity {
                         View view = Objects.requireNonNull(recyclerView.getLayoutManager()).findViewByPosition(i);
                         //if view is ever null it means the view is not displayed on the page
                         final TextView textView = (TextView) view.findViewById(R.id.multiAutoCompleteTextView);
-//            todo breaks here after count of 6!!
-                        //textView.setEnabled(true);
+//            todo: breaks here after count of 6!!
+                        textView.setEnabled(true);
                         final int finalI = i;
                         textView.setOnLongClickListener(new View.OnLongClickListener() {
                             @Override
