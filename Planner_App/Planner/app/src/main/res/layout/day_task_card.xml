@@ -27,18 +27,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:autoLink="web|phone|map|email"
-                android:autoText="true"
+                android:autoText="false"
                 android:background="#FFFFFF"
                 android:drawableBottom="@drawable/text_view_bottom_divider"
-                android:duplicateParentState="false"
-                android:editable="true"
-                android:enabled="false"
+                android:editable="false"
+                android:enabled="true"
                 android:fontFamily="serif-monospace"
                 android:hint="Enter note or to-do:"
                 android:keepScreenOn="false"
-                android:text="MultiAutoCompleteTextView"
                 android:textColorHighlight="#FAE848"
-                android:textColorLink="#2077F8" />
+                android:textColorLink="#2077F8"
+                android:visibility="visible" />
         </androidx.cardview.widget.CardView>
     </LinearLayout>
 

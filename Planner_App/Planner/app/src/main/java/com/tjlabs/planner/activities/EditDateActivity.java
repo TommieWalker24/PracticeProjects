@@ -8,9 +8,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.PopupWindow;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -24,6 +27,7 @@ import java.util.Objects;
 
 import adapters.TaskAdapter;
 import objects.CalendarDay;
+import objects.NewTask;
 import objects.TaskTextChangeListener;
 
 public class EditDateActivity extends AppCompatActivity {
@@ -81,23 +85,41 @@ public class EditDateActivity extends AppCompatActivity {
                         View view = Objects.requireNonNull(recyclerView.getLayoutManager()).findViewByPosition(i);
                         //if view is ever null it means the view is not displayed on the page
                         final TextView textView = (TextView) view.findViewById(R.id.multiAutoCompleteTextView);
-//            todo: breaks here after count of 6!!
-                        textView.setEnabled(true);
                         final int finalI = i;
-                        textView.setOnLongClickListener(new View.OnLongClickListener() {
+                        textView.setOnClickListener(new View.OnClickListener() {
                             @Override
-                            public boolean onLongClick(View v) {
-                                //todo: do something to make the selected note information visible
-                                recyclerView.scrollToPosition(finalI);
-                                System.out.println("View was long clicked!!!!!");
-                                return true;
+                            public void onClick(View v) {
+                                NewTask newTask = new NewTask();
+                                newTask.setDateString(editDate.getText().toString());
+                                //get the task description
+                                String taskDescription = sharedPreferences.getString(editDate.getText().toString()+ "_"+ finalI, "Not Available");
+                                String time = sharedPreferences.getString(editDate.getText().toString()+ "_"+ finalI + "_time", "Time not found");
+                                String location =  sharedPreferences.getString(editDate.getText().toString()+ "_"+ finalI + "_location", "Location not found");;
+                                newTask.setTask(taskDescription);
+                                newTask.setLocation(location);
+                                newTask.setTime(time);
+                                newTask.showPopupWindow(v);
+                                System.out.println("View at position " + finalI + " was clicked!");
                             }
                         });
-                        //need to verify index with what number textview we are actually using in taskList. Recycle view will on use first visible slots and reuse them when scrolled
-                        i = verifyIndex(i, textView.getText().toString(), layout);
-                        taskTextChangeListener = new TaskTextChangeListener(recyclerView, taskList,i, selectedDate[0], editor);
-                        textView.addTextChangedListener(taskTextChangeListener);
                     }
+//////            todo: breaks here after count of 6!!
+////                        textView.setEnabled(true);
+////                        final int finalI = i;
+////                        textView.setOnLongClickListener(new View.OnLongClickListener() {
+////                            @Override
+////                            public boolean onLongClick(View v) {
+////                                //todo: do something to make the selected note information visible
+////                                recyclerView.scrollToPosition(finalI);
+////                                System.out.println("View was long clicked!!!!!");
+////                                return true;
+////                            }
+////                        });
+////                        //need to verify index with what number textview we are actually using in taskList. Recycle view will on use first visible slots and reuse them when scrolled
+////                        i = verifyIndex(i, textView.getText().toString(), layout);
+////                        taskTextChangeListener = new TaskTextChangeListener(recyclerView, taskList,i, selectedDate[0], editor);
+////                        textView.addTextChangedListener(taskTextChangeListener);
+////                    }
                 }
                 //if switch is off, detach task textView listeners
                 else {
@@ -112,15 +134,20 @@ public class EditDateActivity extends AppCompatActivity {
                         View view = Objects.requireNonNull(recyclerView.getLayoutManager()).findViewByPosition(i);
                         final TextView textView = (TextView) view.findViewById(R.id.multiAutoCompleteTextView);
                         //remove listeners
-                        textView.removeTextChangedListener(taskTextChangeListener);
-                        textView.setEnabled(false);
+//                        textView.removeTextChangedListener(taskTextChangeListener);
+                        textView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+
+                            }
+                        });
                     }
                 }
             }
         });
 
 
-        //Scroll Listener
+//        Scroll Listener
         recyclerView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
             @Override
             public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
@@ -128,12 +155,25 @@ public class EditDateActivity extends AppCompatActivity {
                 for (int i = layout.findFirstVisibleItemPosition(); i <= layout.findLastVisibleItemPosition(); i++) {
                     View view = layout.findViewByPosition(i);
                     TextView textView = view.findViewById(R.id.multiAutoCompleteTextView);
+                    final int finalI = i;
                     if (editSwitch.isChecked()) {
-                        textView.setEnabled(true);
+                        //textView.setEnabled(true);
                         //textChangeListener(textView, selectedDate[0], recyclerView, editor, taskAdapter[0][0], i);
+                        textView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                System.out.println("View at position " + finalI + " was clicked!");
+                            }
+                        });
                     } else {
-                        //removeChangeListener(textView, selectedDate[0],recyclerView,editor, taskAdapter[0][0],i);
-                        textView.setEnabled(false);
+//                        removeChangeListener(textView, selectedDate[0],recyclerView,editor, taskAdapter[0][0],i);
+//                        textView.setEnabled(false);
+                        textView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+
+                            }
+                        });
                     }
                 }
 
@@ -194,21 +234,14 @@ public class EditDateActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (editSwitch.isChecked()) {
-                    //turn edit mode off
-                    editSwitch.performClick();
-                   // if (!taskList.contains("")) {
-                        //editSwitch.toggle();
-                        taskList.add("");
-                        Objects.requireNonNull(recyclerView.getAdapter()).notifyItemInserted(taskList.size() - 1);
-                        taskAdapter[0][0].notifyDataSetChanged();
-                        editor.putString(selectedDate[0] + "_" + taskList.size(), "");
-                        editor.apply();
-                   // }
-                    //turn edit mode back on to re-attach listeners for all items in list
-                    editSwitch.performClick();
+                    NewTask newTask = new NewTask();
+                    newTask.setDateString(editDate.getText().toString());
+                    newTask.showPopupWindow(v);
                 }
             }
         });
+
+
 
         //Calendar View button
         calendarFloatingActionButton.setOnClickListener(new View.OnClickListener() {

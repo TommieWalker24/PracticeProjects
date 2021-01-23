@@ -52,6 +52,12 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder>{
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             textViewTask = (TextView) itemView.findViewById(R.id.multiAutoCompleteTextView);
+//            textViewTask.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    System.out.println("Item was clicked!!");
+//                }
+//            });
         }
     }
 

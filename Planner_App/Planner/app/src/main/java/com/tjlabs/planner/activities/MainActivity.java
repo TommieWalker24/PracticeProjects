@@ -1,14 +1,10 @@
 package com.tjlabs.planner.activities;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.view.View;
 import android.widget.CalendarView;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -19,12 +15,7 @@ import com.tjlabs.planner.R;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.Set;
-
 import objects.CalendarDay;
 
 public class MainActivity extends AppCompatActivity {
@@ -42,6 +33,8 @@ public class MainActivity extends AppCompatActivity {
         final TextView date  = findViewById(R.id.dateInsert);
         CalendarDay currentDate = new CalendarDay(LocalDate.now().getMonthValue(),LocalDate.now().getDayOfMonth(), LocalDate.now().getYear());
         date.setText(currentDate.toString());
+//        BusyDayNotification busyDayNotification = new BusyDayNotification(calendarView);
+//        busyDayNotification.createNotificationChannel();
 
         //Listener for the calendar view
         CalendarView.OnDateChangeListener listener =new CalendarView.OnDateChangeListener() {

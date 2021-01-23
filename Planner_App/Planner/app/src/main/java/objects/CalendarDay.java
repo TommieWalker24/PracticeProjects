@@ -7,9 +7,6 @@ import androidx.annotation.RequiresApi;
 import org.javatuples.Triplet;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
