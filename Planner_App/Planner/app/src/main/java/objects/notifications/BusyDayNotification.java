@@ -13,8 +13,7 @@ package objects.notifications;
 
 public class BusyDayNotification {
     View view;
-    String stringID;
-    public int id = Integer.parseInt(stringID);
+
 
 
     public NotificationCompat.Builder builder(){

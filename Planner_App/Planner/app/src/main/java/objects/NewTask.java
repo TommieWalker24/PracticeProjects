@@ -21,6 +21,8 @@ import com.tjlabs.planner.activities.EditDateActivity;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 
+import objects.notifications.BusyDayNotification;
+
 //import objects.notifications.BusyDayNotification;
 
 public class NewTask {
@@ -94,9 +96,9 @@ public class NewTask {
 
                 Toast.makeText(view.getContext(), "Task added", Toast.LENGTH_SHORT).show();
                 NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(view.getContext());
-//                BusyDayNotification busyDayNotification = new BusyDayNotification(view);
-//                busyDayNotification.createNotificationChannel();
-//                notificationManagerCompat.notify(busyDayNotification.id, busyDayNotification.builder().build());
+                BusyDayNotification busyDayNotification = new BusyDayNotification(view);
+                busyDayNotification.createNotificationChannel();
+                notificationManagerCompat.notify(Integer.parseInt(view.getContext().getString(R.string.channel_ID)), busyDayNotification.builder().build());
                 popupWindow.dismiss();
                 view.getContext().startActivity(intent);
             }
