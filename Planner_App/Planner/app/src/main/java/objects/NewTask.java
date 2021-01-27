@@ -74,7 +74,7 @@ public class NewTask {
             address.setText(location.toString());
         }
         Button applyButton = newTaskView.findViewById(R.id.taskApplyButton);
-        RadioButton pmButton = newTaskView.findViewById(R.id.radioButtonPM);
+        final RadioButton pmButton = newTaskView.findViewById(R.id.radioButtonPM);
         RadioButton amButton = newTaskView.findViewById(R.id.radioButtonAM);
 
         applyButton.setOnClickListener(new View.OnClickListener() {
@@ -132,10 +132,17 @@ public class NewTask {
                 calendar.set(Calendar.DAY_OF_MONTH,Integer.parseInt(selectDate[1]));
 
                 calendar.set(Calendar.YEAR, Integer.parseInt(selectDate[2]));
-              //  calendar.set(Calendar.HOUR,12+ Integer.parseInt(time.getText().toString().split(":")[0]));
+                if(pmButton.isChecked()){
+                    calendar.set(Calendar.HOUR, 12+Integer.parseInt(time.getText().toString().split(":")[0]));
+                }
+                else {
+                    calendar.set(Calendar.HOUR, Integer.parseInt(time.getText().toString().split(":")[0]));
+                }
+
                 calendar.set(Calendar.MINUTE,Integer.parseInt(timeArray[1]) -1);
                 calendar.set(Calendar.SECOND, 0);
                 calendar.set(Calendar.MILLISECOND, 0);
+
                 Date setDate = calendar.getTime();
                 long diffInMillies = Math.abs(setDate.getTime() -  current.getTime());
                 alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime()+ diffInMillies,"notifications", alarmListener,handler );
