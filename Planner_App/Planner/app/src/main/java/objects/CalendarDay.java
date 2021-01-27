@@ -70,4 +70,7 @@ public class CalendarDay {
         return LocalDate.of(dayID.getValue2().intValue(), dayID.getValue0().intValue(), dayID.getValue1().intValue()).minusDays(1);
     }
 
+    public void addNote(String note) {
+        notes.add(note);
+    }
 }

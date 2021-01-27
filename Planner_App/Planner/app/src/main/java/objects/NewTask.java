@@ -1,8 +1,13 @@
 package objects;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -15,11 +20,18 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationManagerCompat;
 import com.tjlabs.planner.R;
 import com.tjlabs.planner.activities.EditDateActivity;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.LinkedHashSet;
+import java.util.Locale;
 
 import objects.notifications.BusyDayNotification;
 
@@ -66,9 +78,10 @@ public class NewTask {
         RadioButton amButton = newTaskView.findViewById(R.id.radioButtonAM);
 
         applyButton.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onClick(View v) {
-                CalendarDay calendarDay = new CalendarDay(dateString);
+                final CalendarDay calendarDay = new CalendarDay(dateString);
                 if (sharedPreferences.contains(dateString)) {
                     Boolean foundAll = false;
                     int index = 0;
@@ -89,16 +102,47 @@ public class NewTask {
                 editor.putString(dateString+"_"+tasks.size()+"_time", time.getText().toString());
                 editor.putString(dateString+"_"+tasks.size()+"_location",address.getText().toString());
                 editor.apply();
+
                 tasks.add(description.getText().toString());
-                Intent intent = new Intent(view.getContext(), EditDateActivity.class);
+                calendarDay.addNote(description.getText().toString());
+                final Intent intent = new Intent(view.getContext(), EditDateActivity.class);
                 intent.putExtra("Date", dateString);
                 intent.putExtra("Tasks", tasks);
 
                 Toast.makeText(view.getContext(), "Task added", Toast.LENGTH_SHORT).show();
-                NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(view.getContext());
-                BusyDayNotification busyDayNotification = new BusyDayNotification(view);
+                final NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(view.getContext());
+                final BusyDayNotification busyDayNotification = new BusyDayNotification(view);
                 busyDayNotification.createNotificationChannel();
-                notificationManagerCompat.notify(Integer.parseInt(view.getContext().getString(R.string.channel_ID)), busyDayNotification.builder().build());
+                AlarmManager alarmManager = (AlarmManager) view.getContext().getSystemService(Context.ALARM_SERVICE);
+                AlarmManager.OnAlarmListener alarmListener = new AlarmManager.OnAlarmListener() {
+                    @Override
+                    public void onAlarm() {
+                        notificationManagerCompat.notify(Integer.parseInt(view.getContext().getString(R.string.channel_ID)), busyDayNotification.builder(calendarDay).build());
+
+                    }
+                };
+                Handler handler = new Handler();
+
+                Calendar calendar = Calendar.getInstance();
+                Date current = new Date();
+
+                String[] selectDate = calendarDay.toString().split("/");
+                String[] timeArray = time.getText().toString().split(":");
+                calendar.set(Calendar.MONTH,Integer.parseInt(selectDate[0]) -1 );
+                calendar.set(Calendar.DAY_OF_MONTH,Integer.parseInt(selectDate[1]));
+
+                calendar.set(Calendar.YEAR, Integer.parseInt(selectDate[2]));
+              //  calendar.set(Calendar.HOUR,12+ Integer.parseInt(time.getText().toString().split(":")[0]));
+                calendar.set(Calendar.MINUTE,Integer.parseInt(timeArray[1]) -1);
+                calendar.set(Calendar.SECOND, 0);
+                calendar.set(Calendar.MILLISECOND, 0);
+                Date setDate = calendar.getTime();
+                long diffInMillies = Math.abs(setDate.getTime() -  current.getTime());
+                alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime()+ diffInMillies,"notifications", alarmListener,handler );
+                //notificationManagerCompat.notify(Integer.parseInt(view.getContext().getString(R.string.channel_ID)), busyDayNotification.builder(calendarDay).build());
+//                popupWindow.dismiss();
+//                view.getContext().startActivity(intent);
+
                 popupWindow.dismiss();
                 view.getContext().startActivity(intent);
             }
