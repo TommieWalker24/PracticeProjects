@@ -38,10 +38,14 @@ import objects.notifications.BusyDayNotification;
 //import objects.notifications.BusyDayNotification;
 
 public class NewTask {
+    boolean exists;
     String dateString;
     String task;
     String taskTime;
     String location;
+    boolean pm;
+    boolean edit;
+    int index;
 
     public void showPopupWindow(final View view){
         final SharedPreferences sharedPreferences = view.getContext().getApplicationContext().getSharedPreferences("Notes", Context.MODE_PRIVATE);
@@ -73,89 +77,194 @@ public class NewTask {
         if(location != null){
             address.setText(location.toString());
         }
-        Button applyButton = newTaskView.findViewById(R.id.taskApplyButton);
         final RadioButton pmButton = newTaskView.findViewById(R.id.radioButtonPM);
         RadioButton amButton = newTaskView.findViewById(R.id.radioButtonAM);
+        if(pm){
+            pmButton.setChecked(true);
+        }else{
+            amButton.setChecked(true);
+        }
+        Button applyButton = newTaskView.findViewById(R.id.taskApplyButton);
 
-        applyButton.setOnClickListener(new View.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.N)
-            @Override
-            public void onClick(View v) {
-                final CalendarDay calendarDay = new CalendarDay(dateString);
-                if (sharedPreferences.contains(dateString)) {
-                    Boolean foundAll = false;
-                    int index = 0;
-                    LinkedHashSet<String> hashSet = new LinkedHashSet<>();
-                    while(!foundAll){
-                        if(sharedPreferences.contains(dateString+"_"+(index))){
-                            hashSet.add(sharedPreferences.getString(dateString+"_"+index, null));
-                            index++;
+
+        //if this exists, view only
+        if(exists == true && edit == false){
+            //disable form
+            time.setEnabled(false);
+            description.setEnabled(false);
+            description.setClickable(true);
+            address.setEnabled(false);
+            address.setClickable(true);
+            pmButton.setEnabled(false);
+            amButton.setEnabled(false);
+            applyButton.setEnabled(false);
+        }
+        //want field to edit but not add new entry when submitted
+        else if(exists == true && edit == true){
+            applyButton.setOnClickListener(new View.OnClickListener() {
+                @RequiresApi(api = Build.VERSION_CODES.N)
+                @Override
+                public void onClick(View v) {
+                    final CalendarDay calendarDay = new CalendarDay(dateString);
+                    if (sharedPreferences.contains(dateString)) {
+                        Boolean foundAll = false;
+                        int index = 0;
+                        LinkedHashSet<String> hashSet = new LinkedHashSet<>();
+                        while(!foundAll){
+                            if(sharedPreferences.contains(dateString+"_"+(index))){
+                                hashSet.add(sharedPreferences.getString(dateString+"_"+index, null));
+                                index++;
+                            }
+                            else{
+                                foundAll =true;
+                            }
                         }
-                        else{
-                            foundAll =true;
+                        calendarDay.setNotes(hashSet);
+                    }
+                    ArrayList<String> tasks = new ArrayList<>(calendarDay.getNotes());
+                    editor.putString(dateString + "_" + index, description.getText().toString());
+                    editor.putString(dateString+"_"+index+"_time", time.getText().toString());
+                    editor.putString(dateString+"_"+index+"_location",address.getText().toString());
+                    editor.putBoolean(dateString+"_"+index+"_pm",pmButton.isChecked());
+                    editor.apply();
+
+                    tasks.set(index, description.getText().toString());
+                    LinkedHashSet <String> lh = new LinkedHashSet<String>();
+                    for(String s: tasks){
+                        lh.add(s);
+                    }
+                    calendarDay.setNotes(lh);
+//                    calendarDay.addNote(description.getText().toString());
+                    final Intent intent = new Intent(view.getContext(), EditDateActivity.class);
+                    intent.putExtra("Date", dateString);
+                    intent.putExtra("Tasks", tasks);
+
+                    Toast.makeText(view.getContext(), "Task Edited", Toast.LENGTH_SHORT).show();
+                    final NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(view.getContext());
+                    final BusyDayNotification busyDayNotification = new BusyDayNotification(view);
+                    busyDayNotification.createNotificationChannel();
+                    AlarmManager alarmManager = (AlarmManager) view.getContext().getSystemService(Context.ALARM_SERVICE);
+                    AlarmManager.OnAlarmListener alarmListener = new AlarmManager.OnAlarmListener() {
+                        @Override
+                        public void onAlarm() {
+                            notificationManagerCompat.notify(Integer.parseInt(view.getContext().getString(R.string.channel_ID)), busyDayNotification.builder(calendarDay).build());
+
                         }
+                    };
+                    Handler handler = new Handler();
+
+                    Calendar calendar = Calendar.getInstance();
+                    Date current = new Date();
+
+                    String[] selectDate = calendarDay.toString().split("/");
+                    String[] timeArray = time.getText().toString().split(":");
+                    calendar.set(Calendar.MONTH,Integer.parseInt(selectDate[0]) -1 );
+                    calendar.set(Calendar.DAY_OF_MONTH,Integer.parseInt(selectDate[1]));
+
+                    calendar.set(Calendar.YEAR, Integer.parseInt(selectDate[2]));
+                    if(pmButton.isChecked()){
+                        calendar.set(Calendar.HOUR, 12+Integer.parseInt(time.getText().toString().split(":")[0]));
                     }
-                    calendarDay.setNotes(hashSet);
-                }
-                ArrayList<String> tasks = new ArrayList<>(calendarDay.getNotes());
-                editor.putString(dateString + "_" + tasks.size(), description.getText().toString());
-                editor.putString(dateString+"_"+tasks.size()+"_time", time.getText().toString());
-                editor.putString(dateString+"_"+tasks.size()+"_location",address.getText().toString());
-                editor.apply();
-
-                tasks.add(description.getText().toString());
-                calendarDay.addNote(description.getText().toString());
-                final Intent intent = new Intent(view.getContext(), EditDateActivity.class);
-                intent.putExtra("Date", dateString);
-                intent.putExtra("Tasks", tasks);
-
-                Toast.makeText(view.getContext(), "Task added", Toast.LENGTH_SHORT).show();
-                final NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(view.getContext());
-                final BusyDayNotification busyDayNotification = new BusyDayNotification(view);
-                busyDayNotification.createNotificationChannel();
-                AlarmManager alarmManager = (AlarmManager) view.getContext().getSystemService(Context.ALARM_SERVICE);
-                AlarmManager.OnAlarmListener alarmListener = new AlarmManager.OnAlarmListener() {
-                    @Override
-                    public void onAlarm() {
-                        notificationManagerCompat.notify(Integer.parseInt(view.getContext().getString(R.string.channel_ID)), busyDayNotification.builder(calendarDay).build());
-
+                    else {
+                        calendar.set(Calendar.HOUR, Integer.parseInt(time.getText().toString().split(":")[0]));
                     }
-                };
-                Handler handler = new Handler();
 
-                Calendar calendar = Calendar.getInstance();
-                Date current = new Date();
+                    calendar.set(Calendar.MINUTE,Integer.parseInt(timeArray[1]) -1);
+                    calendar.set(Calendar.SECOND, 0);
+                    calendar.set(Calendar.MILLISECOND, 0);
 
-                String[] selectDate = calendarDay.toString().split("/");
-                String[] timeArray = time.getText().toString().split(":");
-                calendar.set(Calendar.MONTH,Integer.parseInt(selectDate[0]) -1 );
-                calendar.set(Calendar.DAY_OF_MONTH,Integer.parseInt(selectDate[1]));
+                    Date setDate = calendar.getTime();
+                    long diffInMillies = Math.abs(setDate.getTime() -  current.getTime());
+                    //sets the time to initiate notification
+                    alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime()+ diffInMillies,"notifications", alarmListener,handler );
 
-                calendar.set(Calendar.YEAR, Integer.parseInt(selectDate[2]));
-                if(pmButton.isChecked()){
-                    calendar.set(Calendar.HOUR, 12+Integer.parseInt(time.getText().toString().split(":")[0]));
+                    popupWindow.dismiss();
+                    view.getContext().startActivity(intent);
                 }
-                else {
-                    calendar.set(Calendar.HOUR, Integer.parseInt(time.getText().toString().split(":")[0]));
+            });
+        }
+        //if this is new entry
+        else{
+            applyButton.setOnClickListener(new View.OnClickListener() {
+                @RequiresApi(api = Build.VERSION_CODES.N)
+                @Override
+                public void onClick(View v) {
+                    final CalendarDay calendarDay = new CalendarDay(dateString);
+                    if (sharedPreferences.contains(dateString)) {
+                        Boolean foundAll = false;
+                        int index = 0;
+                        LinkedHashSet<String> hashSet = new LinkedHashSet<>();
+                        while(!foundAll){
+                            if(sharedPreferences.contains(dateString+"_"+(index))){
+                                hashSet.add(sharedPreferences.getString(dateString+"_"+index, null));
+                                index++;
+                            }
+                            else{
+                                foundAll =true;
+                            }
+                        }
+                        calendarDay.setNotes(hashSet);
+                    }
+                    ArrayList<String> tasks = new ArrayList<>(calendarDay.getNotes());
+                    editor.putString(dateString + "_" + tasks.size(), description.getText().toString());
+                    editor.putString(dateString+"_"+tasks.size()+"_time", time.getText().toString());
+                    editor.putString(dateString+"_"+tasks.size()+"_location",address.getText().toString());
+                    editor.putBoolean(dateString+"_"+tasks.size()+"_pm",pmButton.isChecked());
+                    editor.apply();
+
+                    tasks.add(description.getText().toString());
+                    calendarDay.addNote(description.getText().toString());
+                    final Intent intent = new Intent(view.getContext(), EditDateActivity.class);
+                    intent.putExtra("Date", dateString);
+                    intent.putExtra("Tasks", tasks);
+
+                    Toast.makeText(view.getContext(), "Task added", Toast.LENGTH_SHORT).show();
+                    final NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(view.getContext());
+                    final BusyDayNotification busyDayNotification = new BusyDayNotification(view);
+                    busyDayNotification.createNotificationChannel();
+                    AlarmManager alarmManager = (AlarmManager) view.getContext().getSystemService(Context.ALARM_SERVICE);
+                    AlarmManager.OnAlarmListener alarmListener = new AlarmManager.OnAlarmListener() {
+                        @Override
+                        public void onAlarm() {
+                            notificationManagerCompat.notify(Integer.parseInt(view.getContext().getString(R.string.channel_ID)), busyDayNotification.builder(calendarDay).build());
+
+                        }
+                    };
+                    Handler handler = new Handler();
+
+                    Calendar calendar = Calendar.getInstance();
+                    Date current = new Date();
+
+                    String[] selectDate = calendarDay.toString().split("/");
+                    String[] timeArray = time.getText().toString().split(":");
+                    calendar.set(Calendar.MONTH,Integer.parseInt(selectDate[0]) -1 );
+                    calendar.set(Calendar.DAY_OF_MONTH,Integer.parseInt(selectDate[1]));
+
+                    calendar.set(Calendar.YEAR, Integer.parseInt(selectDate[2]));
+                    if(pmButton.isChecked()){
+                        calendar.set(Calendar.HOUR, 12+Integer.parseInt(time.getText().toString().split(":")[0]));
+                    }
+                    else {
+                        calendar.set(Calendar.HOUR, Integer.parseInt(time.getText().toString().split(":")[0]));
+                    }
+
+                    calendar.set(Calendar.MINUTE,Integer.parseInt(timeArray[1]) -1);
+                    calendar.set(Calendar.SECOND, 0);
+                    calendar.set(Calendar.MILLISECOND, 0);
+
+                    Date setDate = calendar.getTime();
+                    long diffInMillies = Math.abs(setDate.getTime() -  current.getTime());
+                    //sets the time to initiate notification
+                    alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime()+ diffInMillies,"notifications", alarmListener,handler );
+
+                    popupWindow.dismiss();
+                    view.getContext().startActivity(intent);
                 }
-
-                calendar.set(Calendar.MINUTE,Integer.parseInt(timeArray[1]) -1);
-                calendar.set(Calendar.SECOND, 0);
-                calendar.set(Calendar.MILLISECOND, 0);
-
-                Date setDate = calendar.getTime();
-                long diffInMillies = Math.abs(setDate.getTime() -  current.getTime());
-                alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime()+ diffInMillies,"notifications", alarmListener,handler );
-                //notificationManagerCompat.notify(Integer.parseInt(view.getContext().getString(R.string.channel_ID)), busyDayNotification.builder(calendarDay).build());
-//                popupWindow.dismiss();
-//                view.getContext().startActivity(intent);
-
-                popupWindow.dismiss();
-                view.getContext().startActivity(intent);
-            }
-        });
+            });
+        }
 
 
+        //close the window when touched outside of view
         newTaskView.setOnTouchListener(new View.OnTouchListener(){
             public boolean onTouch(View v, MotionEvent event){
                 popupWindow.dismiss();
@@ -175,6 +284,10 @@ public class NewTask {
     public void setLocation(String location){
         this.location = location;
     }
+    public void setExists(boolean exists){this.exists = exists;}
+    public void setPM(boolean bool){this.pm = bool;}
+    public void setIndex(int i){this.index = i;}
+    public void setEdit(boolean edit){this.edit = edit;}
 
 
 }

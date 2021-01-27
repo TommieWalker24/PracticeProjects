@@ -29,6 +29,7 @@
                 android:autoLink="web|phone|map|email"
                 android:autoText="false"
                 android:background="#FFFFFF"
+                android:clickable="true"
                 android:drawableBottom="@drawable/text_view_bottom_divider"
                 android:editable="false"
                 android:enabled="true"

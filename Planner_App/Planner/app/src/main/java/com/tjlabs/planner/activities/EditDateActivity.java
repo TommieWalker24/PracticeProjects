@@ -90,16 +90,23 @@ public class EditDateActivity extends AppCompatActivity {
                             @Override
                             public void onClick(View v) {
                                 NewTask newTask = new NewTask();
+                                newTask.setEdit(true);
                                 newTask.setDateString(editDate.getText().toString());
+                                if(sharedPreferences.contains(editDate.getText().toString())){
+                                    newTask.setExists(true);
+                                }
                                 //get the task description
                                 String taskDescription = sharedPreferences.getString(editDate.getText().toString()+ "_"+ finalI, "Not Available");
                                 String time = sharedPreferences.getString(editDate.getText().toString()+ "_"+ finalI + "_time", "Time not found");
-                                String location =  sharedPreferences.getString(editDate.getText().toString()+ "_"+ finalI + "_location", "Location not found");;
+                                String location =  sharedPreferences.getString(editDate.getText().toString()+ "_"+ finalI + "_location", "Location not found");
+                                Boolean pm = sharedPreferences.getBoolean(editDate.getText().toString()+ "_"+ finalI + "_pm", false);
                                 newTask.setTask(taskDescription);
                                 newTask.setLocation(location);
                                 newTask.setTime(time);
+                                newTask.setPM(pm);
+                                newTask.setIndex(finalI);
+                                //show the popup window
                                 newTask.showPopupWindow(v);
-                                System.out.println("View at position " + finalI + " was clicked!");
                             }
                         });
                     }
@@ -135,9 +142,28 @@ public class EditDateActivity extends AppCompatActivity {
                         final TextView textView = (TextView) view.findViewById(R.id.multiAutoCompleteTextView);
                         //remove listeners
 //                        textView.removeTextChangedListener(taskTextChangeListener);
+                        final int finalI = i;
                         textView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
+                                NewTask newTask = new NewTask();
+                                newTask.setEdit(false);
+                                newTask.setDateString(editDate.getText().toString());
+                                if(sharedPreferences.contains(editDate.getText().toString())){
+                                    newTask.setExists(true);
+                                }
+                                //get the task description
+                                String taskDescription = sharedPreferences.getString(editDate.getText().toString()+ "_"+ finalI, "Not Available");
+                                String time = sharedPreferences.getString(editDate.getText().toString()+ "_"+ finalI + "_time", "Time not found");
+                                String location =  sharedPreferences.getString(editDate.getText().toString()+ "_"+ finalI + "_location", "Location not found");
+                                Boolean pm = sharedPreferences.getBoolean(editDate.getText().toString()+ "_"+ finalI + "_pm", false);
+                                newTask.setTask(taskDescription);
+                                newTask.setLocation(location);
+                                newTask.setTime(time);
+                                newTask.setPM(pm);
+                                newTask.setIndex(finalI);
+                                //show the popup window
+                                newTask.showPopupWindow(v);
 
                             }
                         });
@@ -145,6 +171,9 @@ public class EditDateActivity extends AppCompatActivity {
                 }
             }
         });
+
+
+
 
 
 //        Scroll Listener
@@ -252,6 +281,7 @@ public class EditDateActivity extends AppCompatActivity {
                 }
             }
         });
+
     }
 
     //Return to calendar view
